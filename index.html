@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>מחשבון תקציב רכישת נכס</title>
@@ -205,6 +204,25 @@
     </div>
   </form>
 
+<!-- לוח סילוקין -->
+<section class="card" id="amortSection" style="display:none">
+  <h2>לוח סילוקין</h2>
+  <div style="text-align:right;margin-bottom:1rem">
+    <button type="button" class="btn-primary" id="csvBtn">📥 הורד קובץ CSV</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table id="amortTable" style="width:100%;border-collapse:collapse;text-align:center">
+      <thead style="background:#eef;font-weight:600">
+        <tr>
+          <th>חודש</th><th>יתרת פתיחה</th><th>תשלום חודשי</th><th>ריבית</th><th>קרן</th><th>יתרת סגירה</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+
   
     <style>
       .result-box {
@@ -231,7 +249,7 @@
     <div class="result-item"><p>סכום משכנתא:</p><div class="result-box"><output id="loanAmt">—</output> ₪</div></div>
     <div class="result-item"><p>החזר חודשי משוער:</p><div class="result-box"><output id="monthlyPay">—</output> ₪</div></div>
     <div class="result-item"><p>הכנסה משכירות (חודשית):</p><div class="result-box"><output id="rentIncome">—</output> ₪</div></div>
-    <div class="result-item"><p>נטו מכיס לחודש:</p><div class="result-box"><output id="netOut">—</output> ₪</div></div>
+    <div class="result-item"><p>תשלום חודשי בקיזוז דמי שכירות:</p><div class="result-box"><output id="netOut">—</output> ₪</div></div>
     <div class="result-item"><p>הוצאות נלוות:</p><div class="result-box"><output id="acqCosts">—</output> ₪</div></div>
   </section>
 
@@ -297,11 +315,67 @@ function calculate(){
 }
 </script>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-    }
-  </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// ===== לוח סילוקין + CSV (Excel "sep=;" trick) =====
+function buildAmort(b,a,y){const m=a/12,n=y*12,p=(m===0)?b/n:b*m/(1-Math.pow(1+m,-n));const rows=[];let o=b;for(let i=1;i<=n&&o>0.01;i++){const r=o*m,c=p-r,cl=Math.max(0,o-c);rows.push([i,o,p,r,c,cl]);o=cl;}return rows;}
+function populateAmort(rows){const tb=document.querySelector('#amortTable tbody');tb.innerHTML='';rows.forEach(r=>{const tr=document.createElement('tr');r.forEach(v=>{const td=document.createElement('td');td.textContent=Math.round(v).toLocaleString('en-US');tr.appendChild(td);});tb.appendChild(tr);});document.getElementById('amortSection').style.display='block';}
+function exportCSV(){const header=['חודש','יתרת פתיחה','תשלום חודשי','ריבית','קרן','יתרת סגירה'];const rows=[header];document.querySelectorAll('#amortTable tbody tr').forEach(tr=>{rows.push(Array.from(tr.children).map(td=>td.textContent.replace(/,/g,'')));});const csv=['sep=;'].concat(rows.map(r=>r.join(';'))).join('\n');const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='לוח_סילוקין.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+document.addEventListener('DOMContentLoaded',()=>{const res=document.getElementById('results'),amp=document.getElementById('amortSection');if(res&&amp)res.insertAdjacentElement('afterend',amp);document.getElementById('csvBtn').addEventListener('click',exportCSV);const btn=document.getElementById('calculateBtn'),orig=window.calculate;function wrap(){orig();const loan=Number(document.getElementById('loanAmt').textContent.replace(/,/g,''))||0,rate=Number(document.getElementById('interest').value.replace(/,/g,''))/100||0,age=Number(document.getElementById('age').value.replace(/,/g,''))||0,max=Number(document.getElementById('maxAge').value.replace(/,/g,''))||85;let yrs=Math.min(30,Math.max(max-age,0));if(yrs===0)yrs=30;loan>0?populateAmort(buildAmort(loan,rate,yrs)):amp.style.display='none';}btn.removeEventListener('click',window.calculate);btn.addEventListener('click',wrap);window.calculate=wrap;});
+</script>
+
+<script>
+function exportCSV(){
+  const header = ['חודש','יתרת פתיחה','תשלום חודשי','ריבית','קרן','יתרת סגירה'];
+  const rows   = [header];
+  document.querySelectorAll('#amortTable tbody tr').forEach(tr=>{
+    rows.push(Array.from(tr.children).map(td=>td.textContent.replace(/,/g,'')));
+  });
+  const EOL = '\r\n';
+  const csv = rows.map(r=>r.join(';')).join(EOL);
+  const blob = new Blob(['\uFEFFsep=;'+EOL+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'לוח_סילוקין.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+
+<script>
+function exportCSV(){
+  const header = ['Month','Opening Balance','Monthly Payment','Interest','Principal','Closing Balance'];
+  const rows   = [header];
+  document.querySelectorAll('#amortTable tbody tr').forEach(tr=>{
+    rows.push(Array.from(tr.children).map(td=>td.textContent.replace(/,/g,'')));
+  });
+  const EOL = '\r\n';
+  const csv = rows.map(r=>r.join(';')).join(EOL);
+  const blob = new Blob(['\uFEFFsep=;'+EOL+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Amortization_Schedule.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
 
 </body>
 </html>
