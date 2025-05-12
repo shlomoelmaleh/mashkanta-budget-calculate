@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מחשבון תקציב רכישת נכס</title>
+  <!-- Google Font: Heebo (supports Hebrew) -->
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --clr-primary:#0052cc;          /* כחול מודגש לכפתורים */
+      --clr-primary-light:#3c7bff;   /* hover */
+      --clr-bg:#f7f9fc;              /* רקע כללי עדין */
+      --clr-card:#ffffff;            /* רקע כרטיס */
+      --clr-border:#dfe3e8;          /* גבול עדין */
+      --radius:12px;
+      --shadow:0 4px 12px rgba(0,0,0,.06);
+    }
+
+    /* בסיס */
+    *{box-sizing:border-box}
+    body{
+      margin:0 auto;
+      max-width:900px;
+      padding:1.5rem;
+      font-family:"Heebo",Arial,Helvetica,sans-serif;
+      background:var(--clr-bg);
+      color:#1c1e21;
+    }
+    h1{text-align:center;font-weight:700;margin-top:0}
+    h2{margin:0 0 1rem;font-weight:500;font-size:1.25rem;color:var(--clr-primary)}
+
+    /* כרטיסיות */
+    .card{
+      background:var(--clr-card);
+      border:1px solid var(--clr-border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:1.25rem 1.5rem;
+      margin-block:1.5rem;
+    }
+
+    /* טופס */
+    label{
+      display:flex;
+      flex-direction:column;
+      gap:0.25rem;
+      margin-bottom:1rem;
+      font-size:.95rem;
+    }
+    input[type="text"],
+    input[type="number"]{
+      width:50%; max-width:400px;
+      padding:.45rem .6rem;
+      font-family:inherit;
+      font-size:.95rem;
+      border:1px solid var(--clr-border);
+      border-radius:var(--radius);
+      direction:ltr;
+      text-align:left;
+      background:#fafbff;
+      transition:border .15s;
+    }
+    input:focus{
+      outline:none;
+      border-color:var(--clr-primary);
+    }
+
+    /* שכירות – הסתר/הצג */
+    #rentSection{margin-top:.5rem;border-top:1px dashed var(--clr-border);padding-top:1rem}
+
+    /* כפתור */
+    .btn-primary{
+      display:inline-block;
+      padding:.6rem 2rem;
+      font-size:1rem;
+      font-weight:500;
+      color:#fff;
+      background:var(--clr-primary);
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      transition:background .2s,transform .1s;
+    }
+    .btn-primary:hover{background:var(--clr-primary-light)}
+    .btn-primary:active{transform:scale(.97)}
+
+    /* תוצאות */
+    output{font-weight:700}
+    #results p{margin:.5rem 0}
+
+    /* רספונסיבי */
+    @media(min-width:600px){
+      .grid-2{
+        display:flex;
+        flex-direction:column;
+        gap:1rem 2rem;
+      }
+      label{margin-bottom:0.75rem}
+    }
+  
+  /* Additional aesthetic improvements */
+  body {
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  }
+  .card {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  input[type="text"], input[type="number"] {
+    background-color: #fff;
+    border: 1px solid #ccd0d5;
+  }
+  input[type="text"]:focus, input[type="number"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #0069d9, #004085);
+  }
+  #results {
+    background-color: #edf7ed;
+    border-left: 5px solid #4caf50;
+  }
+
+    .card {
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    input[type="text"], input[type="number"] {
+      width: 40%; 
+      max-width: 250px;
+      text-align: right;
+    }
+    
+    .card {
+      text-align: center;
+    }
+    label {
+      align-items: center;
+    }
+    input[type="text"], input[type="number"] {
+      text-align: right;
+      margin: 0 auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    </style>
+    
+    
+</head>
+<body>
+  <h1>מחשבון תקציב רכישת נכס</h1>
+
+  <form id="calcForm" onsubmit="return false;">
+    <section class="card">
+      <h2>נתוני בסיס</h2>
+      <div class="grid-2">
+        <label>הון עצמי זמין (₪): <input type="text" class="num" id="equity" required value="1,000,000" step="100000"></label>
+        <label>אחוז מימון מקסימלי (%): <input type="text" class="num" id="ltv" value="75" step="1"></label>
+        <label>הכנסה פנויה חודשית (₪): <input type="text" class="num" id="netIncome" required step="1000"></label>
+        <label>יחס החזר/הכנסה מותר (%): <input type="text" class="num" id="ratio" value="33" min="30" max="40" step="1"></label>
+        <label>גיל לווה: <input type="text" class="num" id="age" required></label>
+        <label>גיל פריסה מקסימלי: <input type="text" class="num" id="maxAge" value="85"></label>
+        <label>ריבית שנתית ממוצעת (%): <input type="text" class="num" id="interest" value="5" step="0.1"></label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>נתוני שכירות (אופציונלי)</h2>
+      <label style="flex-direction:row;align-items:center;gap:.5rem">
+        <input type="checkbox" id="isRented"> הנכס יושכר
+      </label>
+      <div id="rentSection" class="grid-2" style="display:none">
+        <label>תשואת שכירות שנתית (%): <input type="text" class="num" id="yield" value="2" step="1"></label>
+        <label>שיעור הכרה בבנק מדמי שכירות (%): <input type="text" class="num" id="rentRecog" value="80" step="1"></label>
+      </div>
+      <label>תקרת הוצאה חודשית נטו (₪, אופציונלי): <input type="text" class="num" id="budgetCap" step="100"></label>
+    </section>
+
+    <section class="card">
+      <h2>הוצאות נלוות</h2>
+      <div class="grid-2">
+        <label>מס רכישה (% משווי נכס): <input type="text" class="num" id="purchaseTax" value="8" step="1"></label>
+        <label>שכר טרחת עו"ד (%): <input type="text" class="num" id="lawyerPct" value="1" step="0.1"></label>
+        <label>דמי תיווך (%): <input type="text" class="num" id="brokerPct" value="2" step="0.1"></label>
+        <label>מע"מ (%): <input type="text" class="num" id="vatPct" value="18" step="1"></label>
+        <label>שכר טרחת יועץ משכנתא (₪): <input type="text" class="num" id="advisorFee" value="15,000" step="1000"></label>
+        <label>הוצאות שונות נוספות (₪): <input type="text" class="num" id="otherFee" value="3,000" step="1000"></label>
+      </div>
+    </section>
+
+    <div style="text-align:center;margin-top:2rem">
+      <button type="button" class="btn-primary" id="calculateBtn">חשב</button>
+    </div>
+  </form>
+
+  
+    <style>
+      .result-box {
+        display: inline-block;
+        background-color: #fff;
+        border: 1px solid #ccd0d5;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        min-width: 200px;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      .result-item {
+        margin-bottom: 1rem;
+      }
+    </style>
+    <section id="results" class="card">
+    
+    <h2>תוצאות</h2>
+    <div class="result-item"><p>שווי נכס מקסימלי:</p><div class="result-box"><output id="pMax">—</output> ₪</div></div>
+    <div class="result-item"><p>סכום משכנתא:</p><div class="result-box"><output id="loanAmt">—</output> ₪</div></div>
+    <div class="result-item"><p>החזר חודשי משוער:</p><div class="result-box"><output id="monthlyPay">—</output> ₪</div></div>
+    <div class="result-item"><p>הכנסה משכירות (חודשית):</p><div class="result-box"><output id="rentIncome">—</output> ₪</div></div>
+    <div class="result-item"><p>נטו מכיס לחודש:</p><div class="result-box"><output id="netOut">—</output> ₪</div></div>
+    <div class="result-item"><p>הוצאות נלוות:</p><div class="result-box"><output id="acqCosts">—</output> ₪</div></div>
+  </section>
+
+<!-- ***** ‎SCRIPT המקורי (ללא שינוי פונקציונלי) ***** -->
+<script>
+// ---------- פורמט מספר עם פסיקים ----------
+const format = n => n.toLocaleString('en-US', {maximumFractionDigits:0});
+
+// ---------- קלטים: פורמט + חיצים ----------
+document.querySelectorAll('.num').forEach(inp=>{
+  const step = Number(inp.getAttribute('step')||1);
+  const numeric = () => Number((inp.value||'').replace(/,/g,'')); // מסיר פסיקים
+  const display = v => inp.value = format(v);                    // מוסיף פסיקים
+  if (inp.value) display(numeric());
+  inp.addEventListener('input', () => {
+    const raw = numeric();
+    if (!isNaN(raw)) display(raw);
+  });
+  inp.addEventListener('keydown', e=>{
+    if (e.key==='ArrowUp'||e.key==='ArrowDown') {
+      e.preventDefault();
+      let v = numeric()||0;
+      v += (e.key==='ArrowUp'?step:-step);
+      if (v<0) v=0;
+      display(v);
+    }
+  });
+});
+
+const $ = id => document.getElementById(id);
+const equity=$('equity'), ltv=$('ltv'), netInc=$('netIncome'), ratio=$('ratio');
+const age=$('age'), maxAge=$('maxAge'), interest=$('interest');
+const isRent=$('isRented'), rentSec=$('rentSection'), yieldF=$('yield'), rentRec=$('rentRecog');
+const budgetCap=$('budgetCap');
+const purchaseTax=$('purchaseTax'), lawyerPct=$('lawyerPct'), brokerPct=$('brokerPct'), vatPct=$('vatPct');
+const advisorFee=$('advisorFee'), otherFee=$('otherFee');
+const pMaxO=$('pMax'), loanO=$('loanAmt'), payO=$('monthlyPay'), rentO=$('rentIncome'), netO=$('netOut'), acqO=$('acqCosts');
+
+isRent.addEventListener('change', ()=> rentSec.style.display = isRent.checked ? 'grid' : 'none');
+$('calculateBtn').addEventListener('click', calculate);
+
+function v(el){return Number(el.value.replace(/,/g,''))||0;}
+
+function calculate(){
+  const E=v(equity), l=v(ltv)/100, inc=v(netInc), r=v(ratio)/100;
+  const years=Math.min(30, Math.max(v(maxAge)-v(age),0));
+  if(years<=0){alert('תקופת ההלוואה אינה תקינה');return;}
+  const rate=v(interest)/100, mRate=rate/12;
+  const A=mRate/(1-Math.pow(1+mRate,-12*years));
+  const rented=isRent.checked, yld=rented?v(yieldF)/100:0, recg=rented?v(rentRecog)/100:0, cap=v(budgetCap)||null;
+  const p=v(purchaseTax)/100, law=v(lawyerPct)/100, bro=v(brokerPct)/100, vat=v(vatPct)/100;
+  const fix=v(advisorFee)+v(otherFee), f=p+(law+bro)*(1+vat);
+  if(E<=fix){alert('ההון העצמי אינו מכסה הוצאות קבועות');return;}
+  const P_equity=(E-fix)/(1+f-l);
+  const denom=A*(1+f)-(r*recg*yld/12), P_income=denom>0?(r*inc+A*(E-fix))/denom:Infinity;
+  let P_budget=Infinity;
+  if(cap){const dBud=A*(1+f)-(yld/12);P_budget=dBud>0?(cap+A*(E-fix))/dBud:Infinity;}
+  const P_max=Math.max(0,Math.min(P_equity,P_income,P_budget));
+  if(!isFinite(P_max)||P_max<=0){alert('אין פתרון עם הנתונים שהוזנו');return;}
+  const acq=P_max*f+fix, loan=P_max*(1+f)-E+fix, pay=A*loan, rent=yld*P_max/12, net=pay-rent;
+  pMaxO.textContent=format(P_max);loanO.textContent=format(loan);payO.textContent=format(pay);
+  rentO.textContent=format(rent);netO.textContent=format(net);acqO.textContent=format(acq);
+}
+</script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+    }
+  </script>
+
+</body>
+</html>

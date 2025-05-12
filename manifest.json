@@ -1,0 +1,16 @@
+{
+  "name": "מחשבון משכנתא",
+  "short_name": "מחשבון",
+  "description": "מחשבון תקציב רכישת נכס (PWA)",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f9fc",
+  "theme_color": "#0052cc",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
