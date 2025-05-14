@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>מחשבון תקציב רכישת נכס</title>
-  <!-- Google Font: Heebo (supports Hebrew) -->
+  <!-- Google Font: Heebo (supports Hebrew) -->
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root{
+      /* חובה */
+      --clr-req:#d00;
       --clr-primary:#0052cc;          /* כחול מודגש לכפתורים */
       --clr-primary-light:#3c7bff;   /* hover */
       --clr-bg:#f7f9fc;              /* רקע כללי עדין */
@@ -66,7 +68,7 @@
       border-color:var(--clr-primary);
     }
 
-    /* שכירות – הסתר/הצג */
+    /* שכירות – הסתר/הצג */
     #rentSection{margin-top:.5rem;border-top:1px dashed var(--clr-border);padding-top:1rem}
 
     /* כפתור */
@@ -154,6 +156,8 @@
     h2 {
       text-align: center;
     }
+    
+    .req{color:var(--clr-req);font-weight:700}
     </style>
     
     
@@ -165,23 +169,31 @@
     <section class="card">
       <h2>נתוני בסיס</h2>
       <div class="grid-2">
-        <label>הון עצמי זמין (₪): <input type="text" class="num" id="equity" required value="1,000,000" step="100000"></label>
-        <label>אחוז מימון מקסימלי (%): <input type="text" class="num" id="ltv" value="75" step="1"></label>
-        <label>הכנסה פנויה חודשית (₪): <input type="text" class="num" id="netIncome" required step="1000"></label>
-        <label>יחס החזר/הכנסה מותר (%): <input type="text" class="num" id="ratio" value="33" min="30" max="40" step="1"></label>
+
+<label>שם פרטי ומשפחה (*) : <input type="text" id="fullName" required></label>
+<label>מספר טלפון (*) : <input type="text" id="phone" required></label>
+<label>אימייל (*) : <input type="text" id="email" required></label>
+
+        <label>הון עצמי זמין (₪): <input type="text" class="num" id="equity" required value="1,000,000" step="10000"></label>
+        <label>אחוז מימון מקסימלי (%): <input type="text" class="num" id="ltv" value="75" step="0.1"></label>
+        <label>הכנסה פנויה חודשית (₪): <input type="text" class="num" id="netIncome" required step="100"></label>
+        <label>יחס החזר/הכנסה מותר (%): <input type="text" class="num" id="ratio" value="33" min="30" max="40" step="0.1"></label>
         <label>גיל לווה: <input type="text" class="num" id="age" required></label>
         <label>גיל פריסה מקסימלי: <input type="text" class="num" id="maxAge" value="85"></label>
-        <label>ריבית שנתית ממוצעת (%): <input type="text" class="num" id="interest" value="5" step="0.1"></label>
+        <label>ריבית שנתית ממוצעת (%): <input type="text" class="decimal-num" id="interest" value="5.0" step="0.1"></label>
       </div>
     </section>
 
-    <section class="card">
+    
+</div>
+<!-- Toggle button for amortization schedule -->
+<section class="card">
       <h2>נתוני שכירות (אופציונלי)</h2>
       <label style="flex-direction:row;align-items:center;gap:.5rem">
         <input type="checkbox" id="isRented"> הנכס יושכר
       </label>
       <div id="rentSection" class="grid-2" style="display:none">
-        <label>תשואת שכירות שנתית (%): <input type="text" class="num" id="yield" value="2" step="1"></label>
+        <label>תשואת שכירות שנתית (%): <input type="text" class="decimal-num" id="yield" value="2.0" step="0.1"></label>
         <label>שיעור הכרה בבנק מדמי שכירות (%): <input type="text" class="num" id="rentRecog" value="80" step="1"></label>
       </div>
       <label>תקרת הוצאה חודשית נטו (₪, אופציונלי): <input type="text" class="num" id="budgetCap" step="100"></label>
@@ -190,12 +202,44 @@
     <section class="card">
       <h2>הוצאות נלוות</h2>
       <div class="grid-2">
-        <label>מס רכישה (% משווי נכס): <input type="text" class="num" id="purchaseTax" value="8" step="1"></label>
-        <label>שכר טרחת עו"ד (%): <input type="text" class="num" id="lawyerPct" value="1" step="0.1"></label>
-        <label>דמי תיווך (%): <input type="text" class="num" id="brokerPct" value="2" step="0.1"></label>
+        <label>
+  <span>מס רכישה:</span>
+  <div>
+    <label>
+      <input type="radio" name="purchaseTaxMode" id="purchaseTaxModePercent" checked>
+      אחוז משווי הנכס
+    </label>
+    <label style="margin-left:1em">
+      <input type="radio" name="purchaseTaxMode" id="purchaseTaxModeFixed">
+      סכום קבוע
+    </label>
+  </div>
+  <input
+    type="number"
+    id="purchaseTaxPercent"
+    class="decimal-num"
+    placeholder="אחוז (%)"
+    min="0"
+    step="0.1"
+    style="margin-top:0.5em;"
+    value="8.0"
+  >
+  <input type="text" 
+    id="purchaseTaxFixed"
+    placeholder="סכום קבוע (שקלים)"
+    
+    
+    style="margin-top:0.5em; display:none;"
+    >
+  <small class="form-text text-muted">
+    אם בחרת “סכום קבוע”, תוכל לחשב אותו ב־<a href="https://www.misim.gov.il/svsimurechisha/FrmSimuMurchav.aspx#nbb" target="_blank">מחשבון רשות המיסים</a> ולהדביק כאן.
+  </small>
+</label>
+        <label>שכר טרחת עו"ד (%): <input type="text" class="decimal-num" id="lawyerPct" value="1.0" step="0.1"></label>
+        <label>דמי תיווך (%): <input type="text" class="decimal-num" id="brokerPct" value="2.0" step="0.1"></label>
         <label>מע"מ (%): <input type="text" class="num" id="vatPct" value="18" step="1"></label>
         <label>שכר טרחת יועץ משכנתא (₪): <input type="text" class="num" id="advisorFee" value="15,000" step="1000"></label>
-        <label>הוצאות שונות נוספות (₪): <input type="text" class="num" id="otherFee" value="3,000" step="1000"></label>
+        <label>הוצאות שונות נוספות (₪): <input type="text" class="num" id="otherFee" value="3,000" step="100"></label>
       </div>
     </section>
 
@@ -204,23 +248,8 @@
     </div>
   </form>
 
-<!-- לוח סילוקין -->
-<section class="card" id="amortSection" style="display:none">
-  <h2>לוח סילוקין</h2>
-  <div style="text-align:right;margin-bottom:1rem">
-    <button type="button" class="btn-primary" id="csvBtn">📥 הורד קובץ CSV</button>
-  </div>
-  <div style="overflow-x:auto">
-    <table id="amortTable" style="width:100%;border-collapse:collapse;text-align:center">
-      <thead style="background:#eef;font-weight:600">
-        <tr>
-          <th>חודש</th><th>יתרת פתיחה</th><th>תשלום חודשי</th><th>ריבית</th><th>קרן</th><th>יתרת סגירה</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</section>
+
+
 
 
   
@@ -247,16 +276,55 @@
     <h2>תוצאות</h2>
     <div class="result-item"><p>שווי נכס מקסימלי:</p><div class="result-box"><output id="pMax">—</output> ₪</div></div>
     <div class="result-item"><p>סכום משכנתא:</p><div class="result-box"><output id="loanAmt">—</output> ₪</div></div>
+    <div class="result-item"><p>אחוז מימון בפועל:</p><div class="result-box"><output id="actualLTV">—</output> %</div></div>
     <div class="result-item"><p>החזר חודשי משוער:</p><div class="result-box"><output id="monthlyPay">—</output> ₪</div></div>
     <div class="result-item"><p>הכנסה משכירות (חודשית):</p><div class="result-box"><output id="rentIncome">—</output> ₪</div></div>
     <div class="result-item"><p>תשלום חודשי בקיזוז דמי שכירות:</p><div class="result-box"><output id="netOut">—</output> ₪</div></div>
     <div class="result-item"><p>סך ההוצאות הנלוות:</p><div class="result-box"><output id="acqCosts">—</output> ₪</div></div>
-  </section>
+  
+</section>
+<div style="text-align:center; margin:1em 0;">
+  <button id="toggleAmortBtn" style="
+    padding:0.5em 1em;
+    font-size:1em;
+    font-weight:600;
+    border:none;
+    border-radius:0.5em;
+    background-color:#3498db;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 2px 4px rgba(0,0,0,0.2);
+    font-family:Arial, sans-serif;
+    transition:background-color 0.3s ease;
+  ">
+    הצג לוח סילוקין ▼
+  </button>
+</div>
 
-<!-- ***** ‎SCRIPT המקורי (ללא שינוי פונקציונלי) ***** -->
+<div id="amortContainer" style="display:none;"><section class="card" id="amortSection" 
+>
+  <h2>לוח סילוקין</h2>
+  <div style="text-align:right;margin-bottom:1rem">
+    <button type="button" class="btn-primary" id="csvBtn">📥 הורד קובץ CSV</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table id="amortTable" style="width:100%;border-collapse:collapse;text-align:center">
+      <thead style="background:#eef;font-weight:600">
+        <tr>
+          <th>חודש</th><th>יתרת פתיחה</th><th>תשלום חודשי</th><th>ריבית</th><th>קרן</th><th>יתרת סגירה</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section></div>
+
+
+<!-- ***** ‎SCRIPT המקורי (עם שינוי לתמיכה במספרים עשרוניים) ***** -->
 <script>
 // ---------- פורמט מספר עם פסיקים ----------
 const format = n => n.toLocaleString('en-US', {maximumFractionDigits:0});
+const formatDecimal = n => n.toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1});
 
 // ---------- קלטים: פורמט + חיצים ----------
 document.querySelectorAll('.num').forEach(inp=>{
@@ -279,14 +347,105 @@ document.querySelectorAll('.num').forEach(inp=>{
   });
 });
 
+// ---------- קלטים עשרוניים: פורמט + חיצים ----------
+document.querySelectorAll('.decimal-num').forEach(inp=>{
+  const step = Number(inp.getAttribute('step')||0.1);
+  
+  // פונקציה לניקוי והמרה של הקלט למספר
+  const numeric = () => {
+    // הסר פסיקים אלפים
+    let val = (inp.value||'').replace(/,/g,'');
+    // החלף פסיקים בנקודות (אם המשתמש הקליד פסיק עשרוני)
+    val = val.replace(/,/g, '.');
+    return Number(val);
+  };
+  
+  // פונקציה להצגת הערך המעוצב
+  const display = v => {
+    // שמירה על מיקום הסמן במידת האפשר
+    const pos = inp.selectionStart;
+    const oldLen = inp.value.length;
+    
+    inp.value = v.toLocaleString('en-US', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    });
+    
+    // החזרת הסמן למיקום הנכון
+    if (document.activeElement === inp) {
+      const newLen = inp.value.length;
+      const newPos = Math.max(0, pos + (newLen - oldLen));
+      setTimeout(() => {
+        inp.setSelectionRange(newPos, newPos);
+      }, 0);
+    }
+  };
+  
+  // הצג ערך התחלתי מעוצב אם יש
+  if (inp.value) {
+    try {
+      display(numeric());
+    } catch(e) {
+      inp.value = step.toLocaleString('en-US', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      });
+    }
+  }
+  
+  // טיפול בהקלדת מספרים ונקודה עשרונית
+  inp.addEventListener('input', () => {
+    // שמירה על מיקום הסמן
+    const pos = inp.selectionStart;
+    
+    // נקה ערך ואפשר רק מספרים, נקודה עשרונית, פסיקים
+    let val = inp.value.replace(/[^\d.,]/g, '');
+    
+    // החלף פסיק עשרוני בנקודה
+    val = val.replace(/,/g, '.');
+    
+    // השאר רק נקודה עשרונית אחת
+    const dotParts = val.split('.');
+    if (dotParts.length > 2) {
+      val = dotParts[0] + '.' + dotParts.slice(1).join('');
+    }
+    
+    // אם יש ערך תקף, הצג אותו מעוצב
+    const num = Number(val);
+    if (!isNaN(num)) {
+      inp.value = val; // שמור על הערך כפי שהוא בזמן העריכה
+    }
+  });
+  
+  // עיצוב הערך בעת יציאה מהשדה
+  inp.addEventListener('blur', () => {
+    const num = numeric();
+    if (!isNaN(num)) {
+      display(num);
+    }
+  });
+  
+  // טיפול בחיצי מקלדת
+  inp.addEventListener('keydown', e=>{
+    if (e.key==='ArrowUp'||e.key==='ArrowDown') {
+      e.preventDefault();
+      let v = numeric()||0;
+      v += (e.key==='ArrowUp'?step:-step);
+      if (v<0) v=0;
+      display(v);
+    }
+  });
+});
+
 const $ = id => document.getElementById(id);
 const equity=$('equity'), ltv=$('ltv'), netInc=$('netIncome'), ratio=$('ratio');
 const age=$('age'), maxAge=$('maxAge'), interest=$('interest');
 const isRent=$('isRented'), rentSec=$('rentSection'), yieldF=$('yield'), rentRec=$('rentRecog');
 const budgetCap=$('budgetCap');
-const purchaseTax=$('purchaseTax'), lawyerPct=$('lawyerPct'), brokerPct=$('brokerPct'), vatPct=$('vatPct');
+lawyerPct=$('lawyerPct'), brokerPct=$('brokerPct'), vatPct=$('vatPct');
 const advisorFee=$('advisorFee'), otherFee=$('otherFee');
-const pMaxO=$('pMax'), loanO=$('loanAmt'), payO=$('monthlyPay'), rentO=$('rentIncome'), netO=$('netOut'), acqO=$('acqCosts');
+const fullName=$('fullName'), phone=$('phone'), email=$('email');
+const pMaxO=$('pMax'), loanO=$('loanAmt'), actualLTVO=$('actualLTV'), payO=$('monthlyPay'), rentO=$('rentIncome'), netO=$('netOut'), acqO=$('acqCosts');
 
 isRent.addEventListener('change', ()=> rentSec.style.display = isRent.checked ? 'grid' : 'none');
 $('calculateBtn').addEventListener('click', calculate);
@@ -294,14 +453,25 @@ $('calculateBtn').addEventListener('click', calculate);
 function v(el){return Number(el.value.replace(/,/g,''))||0;}
 
 function calculate(){
+// אימות שדות חובה
+if(!fullName.value.trim() || !phone.value.trim() || !email.value.trim()){
+  alert('נא למלא שם מלא, טלפון ואימייל לפני החישוב');
+  return;
+}
+
   const E=v(equity), l=v(ltv)/100, inc=v(netInc), r=v(ratio)/100;
   const years=Math.min(30, Math.max(v(maxAge)-v(age),0));
   if(years<=0){alert('תקופת ההלוואה אינה תקינה');return;}
   const rate=v(interest)/100, mRate=rate/12;
   const A=mRate/(1-Math.pow(1+mRate,-12*years));
   const rented=isRent.checked, yld=rented?v(yieldF)/100:0, recg=rented?v(rentRecog)/100:0, cap=v(budgetCap)||null;
-  const p=v(purchaseTax)/100, law=v(lawyerPct)/100, bro=v(brokerPct)/100, vat=v(vatPct)/100;
-  const fix=v(advisorFee)+v(otherFee), f=p+(law+bro)*(1+vat);
+  const law = v(lawyerPct)/100, bro = v(brokerPct)/100, vat = v(vatPct)/100;
+  const isPercentMode = document.getElementById('purchaseTaxModePercent').checked;
+  const purchaseTaxPct = parseFloat(document.getElementById('purchaseTaxPercent').value) || 0;
+  const purchaseTaxFixedVal = parseFloat(document.getElementById('purchaseTaxFixed').value) || 0;
+  const p = isPercentMode ? purchaseTaxPct/100 : 0;
+  let fix = v(advisorFee) + v(otherFee) + (isPercentMode ? 0 : purchaseTaxFixedVal);
+  const f = p + (law + bro)*(1 + vat);
   if(E<=fix){alert('ההון העצמי אינו מכסה הוצאות קבועות');return;}
   const P_equity=(E-fix)/(1+f-l);
   const denom=A*(1+f)-(r*recg*yld/12), P_income=denom>0?(r*inc+A*(E-fix))/denom:Infinity;
@@ -310,29 +480,27 @@ function calculate(){
   const P_max=Math.max(0,Math.min(P_equity,P_income,P_budget));
   if(!isFinite(P_max)||P_max<=0){alert('אין פתרון עם הנתונים שהוזנו');return;}
   const acq=P_max*f+fix, loan=P_max*(1+f)-E+fix, pay=A*loan, rent=yld*P_max/12, net=pay-rent;
-  pMaxO.textContent=format(P_max);loanO.textContent=format(loan);payO.textContent=format(pay);
-  rentO.textContent=format(rent);netO.textContent=format(net);acqO.textContent=format(acq);
+  
+  // חישוב אחוז המימון בפועל
+  const actualLtv = (loan / P_max) * 100;
+  
+  pMaxO.textContent=format(P_max);
+  loanO.textContent=format(loan);
+  actualLTVO.textContent=formatDecimal(actualLtv); // פורמט עם ספרה אחת אחרי הנקודה
+  payO.textContent=format(pay);
+  rentO.textContent=format(rent);
+  netO.textContent=format(net);
+  acqO.textContent=format(acq);
 }
 </script>
 
-  
-
-
-
-
-
-
-
-
-
-
-
+<!-- לוח סילוקין + CSV (Excel "sep=;" trick) -->
 <script>
 // ===== לוח סילוקין + CSV (Excel "sep=;" trick) =====
 function buildAmort(b,a,y){const m=a/12,n=y*12,p=(m===0)?b/n:b*m/(1-Math.pow(1+m,-n));const rows=[];let o=b;for(let i=1;i<=n&&o>0.01;i++){const r=o*m,c=p-r,cl=Math.max(0,o-c);rows.push([i,o,p,r,c,cl]);o=cl;}return rows;}
-function populateAmort(rows){const tb=document.querySelector('#amortTable tbody');tb.innerHTML='';rows.forEach(r=>{const tr=document.createElement('tr');r.forEach(v=>{const td=document.createElement('td');td.textContent=Math.round(v).toLocaleString('en-US');tr.appendChild(td);});tb.appendChild(tr);});document.getElementById('amortSection').style.display='block';}
+function populateAmort(rows){const tb=document.querySelector('#amortTable tbody');tb.innerHTML='';rows.forEach(r=>{const tr=document.createElement('tr');r.forEach(v=>{const td=document.createElement('td');td.textContent=Math.round(v).toLocaleString('en-US');tr.appendChild(td);});tb.appendChild(tr);});}
 function exportCSV(){const header=['חודש','יתרת פתיחה','תשלום חודשי','ריבית','קרן','יתרת סגירה'];const rows=[header];document.querySelectorAll('#amortTable tbody tr').forEach(tr=>{rows.push(Array.from(tr.children).map(td=>td.textContent.replace(/,/g,'')));});const csv=['sep=;'].concat(rows.map(r=>r.join(';'))).join('\n');const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='לוח_סילוקין.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
-document.addEventListener('DOMContentLoaded',()=>{const res=document.getElementById('results'),amp=document.getElementById('amortSection');if(res&&amp)res.insertAdjacentElement('afterend',amp);document.getElementById('csvBtn').addEventListener('click',exportCSV);const btn=document.getElementById('calculateBtn'),orig=window.calculate;function wrap(){orig();const loan=Number(document.getElementById('loanAmt').textContent.replace(/,/g,''))||0,rate=Number(document.getElementById('interest').value.replace(/,/g,''))/100||0,age=Number(document.getElementById('age').value.replace(/,/g,''))||0,max=Number(document.getElementById('maxAge').value.replace(/,/g,''))||85;let yrs=Math.min(30,Math.max(max-age,0));if(yrs===0)yrs=30;loan>0?populateAmort(buildAmort(loan,rate,yrs)):amp.style.display='none';}btn.removeEventListener('click',window.calculate);btn.addEventListener('click',wrap);window.calculate=wrap;});
+document.addEventListener('DOMContentLoaded',()=>{const res=document.getElementById('results'),amp=document.getElementById('amortContainer');if(res&&amp)res.insertAdjacentElement('afterend',amp);document.getElementById('csvBtn').addEventListener('click',exportCSV);const btn=document.getElementById('calculateBtn'),orig=window.calculate;function wrap(){orig();const loan=Number(document.getElementById('loanAmt').textContent.replace(/,/g,''))||0,rate=Number(document.getElementById('interest').value.replace(/,/g,''))/100||0,age=Number(document.getElementById('age').value.replace(/,/g,''))||0,max=Number(document.getElementById('maxAge').value.replace(/,/g,''))||85;let yrs=Math.min(30,Math.max(max-age,0));if(yrs===0)yrs=30;loan>0?populateAmort(buildAmort(loan,rate,yrs)):amp.style.display='none';}btn.removeEventListener('click',window.calculate);btn.addEventListener('click',wrap);window.calculate=wrap;});
 </script>
 
 <script>
@@ -375,6 +543,36 @@ function exportCSV(){
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[name="purchaseTaxMode"]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      var isPercent = document.getElementById('purchaseTaxModePercent').checked;
+      document.getElementById('purchaseTaxPercent').style.display = isPercent ? 'block' : 'none';
+      document.getElementById('purchaseTaxFixed').style.display = isPercent ? 'none' : 'block';
+    });
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('toggleAmortBtn');
+  var container = document.getElementById('amortContainer');
+  btn.addEventListener('click', function() {
+    if (container.style.display === 'none') {
+      container.style.display = 'block';
+      btn.textContent = 'הסתר לוח סילוקין ▲';
+    } else {
+      container.style.display = 'none';
+      btn.textContent = 'הצג לוח סילוקין ▼';
+    }
+  });
+});
 </script>
 
 </body>
