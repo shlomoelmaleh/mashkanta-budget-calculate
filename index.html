@@ -282,6 +282,9 @@
     <div class="result-item"><p>תשלום חודשי בקיזוז דמי שכירות:</p><div class="result-box"><output id="netOut">—</output> ₪</div></div>
     <div class="result-item"><p>סך ההוצאות הנלוות:</p><div class="result-box"><output id="acqCosts">—</output> ₪</div></div>
   
+
+    <div class="result-item"><p>סך תשלומי ריבית:</p><div class="result-box"><output id="totalInterest">—</output> ₪</div></div>
+    <div class="result-item"><p>עלות כוללת (קרן + ריבית):</p><div class="result-box"><output id="totalCost">—</output> ₪</div></div>
 </section>
 <div style="text-align:center; margin:1em 0;">
   <button id="toggleAmortBtn" style="
@@ -445,7 +448,7 @@ const budgetCap=$('budgetCap');
 lawyerPct=$('lawyerPct'), brokerPct=$('brokerPct'), vatPct=$('vatPct');
 const advisorFee=$('advisorFee'), otherFee=$('otherFee');
 const fullName=$('fullName'), phone=$('phone'), email=$('email');
-const pMaxO=$('pMax'), loanO=$('loanAmt'), actualLTVO=$('actualLTV'), payO=$('monthlyPay'), rentO=$('rentIncome'), netO=$('netOut'), acqO=$('acqCosts');
+const pMaxO=$('pMax'), loanO=$('loanAmt'), actualLTVO=$('actualLTV'), payO=$('monthlyPay'), rentO=$('rentIncome'), netO=$('netOut'), acqO=$('acqCosts'); totalInterestO=$('totalInterest'), totalCostO=$('totalCost');
 
 isRent.addEventListener('change', ()=> rentSec.style.display = isRent.checked ? 'grid' : 'none');
 $('calculateBtn').addEventListener('click', calculate);
@@ -491,6 +494,12 @@ if(!fullName.value.trim() || !phone.value.trim() || !email.value.trim()){
   rentO.textContent=format(rent);
   netO.textContent=format(net);
   acqO.textContent=format(acq);
+
+  // חישוב סך תשלומי ריבית ועלות כוללת
+  const totalPayment = pay * 12 * years;
+  const totalInterest = totalPayment - loan;
+  totalInterestO.textContent = format(totalInterest);
+  totalCostO.textContent = format(totalPayment);
 }
 </script>
 
