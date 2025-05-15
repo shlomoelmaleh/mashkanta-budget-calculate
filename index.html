@@ -158,7 +158,55 @@
     }
     
     .req{color:var(--clr-req);font-weight:700}
-    </style>
+    
+/* ===== עיצוב חדש לחלק התוצאות ===== */
+#results {
+  background: #edf7ed;
+  border-left: 5px solid #4caf50;
+  padding: 1rem;
+}
+#results h2 {
+  color: #4caf50;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+#results .results-grid {
+  display: grid;
+  gap: 0.75em;
+}
+#results .result-item {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 0.5em;
+  align-items: center;
+  margin: 0.5em 0;
+}
+#results .result-item p {
+  font-weight: 600;
+  margin: 0;
+}
+#results .result-box {
+  margin: 0;
+  background-color: #fff;
+  border: 1px solid #ccd0d5;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+
+/* הפרדה בין קבוצות תוצאות - בולט יותר */
+#results .results-grid .result-item:nth-child(4),
+#results .results-grid .result-item:nth-child(7) {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px dashed #999;
+}
+
+</style>
     
     
 </head>
@@ -274,7 +322,7 @@
     <section id="results" class="card">
     
     <h2>תוצאות</h2>
-    <div class="result-item"><p>שווי נכס מקסימלי:</p><div class="result-box"><output id="pMax">—</output> ₪</div></div>
+    <div class="results-grid"><div class="result-item"><p>שווי נכס מקסימלי:</p><div class="result-box"><output id="pMax">—</output> ₪</div></div>
     <div class="result-item"><p>סכום משכנתא:</p><div class="result-box"><output id="loanAmt">—</output> ₪</div></div>
     <div class="result-item"><p>אחוז מימון בפועל:</p><div class="result-box"><output id="actualLTV">—</output> %</div></div>
     <div class="result-item"><p>החזר חודשי משוער:</p><div class="result-box"><output id="monthlyPay">—</output> ₪</div></div>
